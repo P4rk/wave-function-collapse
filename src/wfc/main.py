@@ -1,4 +1,4 @@
-from wfc.types import Cell, Tile, Grid
+from wfc.types_ import Cell, Tile, Grid
 
 #https://www.compart.com/en/unicode/block/U+2500
 default_super_position: Cell.SuperPosition = (
