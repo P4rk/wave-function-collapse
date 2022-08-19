@@ -1,8 +1,44 @@
 import copy
+import os.path
 import random
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any
+
+
+class TileRenderer:
+    @staticmethod
+    def is_rendereable(tile):
+        return os.path.isfile(tile.tile)
+
+
+class CellRenderer:
+    @staticmethod
+    def is_renderable(cell):
+        return any(TileRenderer.is_rendereable(tile) for tile in cell.super_position)
+
+    @staticmethod
+    def render(cell, height, width, dimensions):
+        if cell.collapsed:
+            # render tile
+            if CellRenderer.is_renderable(cell):
+                ...
+            else:
+                # If we are rendering the last cell we should render it with a line return
+                end = ""
+                if width == dimensions - 1:
+                    end = "\n"
+                print(cell.super_position[0].tile, end=end)
+        else:
+            # render possibilities
+            if CellRenderer.is_renderable(cell):
+                ...
+            else:
+                # If we are rendering the last cell we should render it with a line return
+                end = ""
+                if width == dimensions - 1:
+                    end = "\n"
+                print(" ", end=end)
 
 
 @dataclass(frozen=True)
@@ -23,9 +59,6 @@ class Tile:
     # A tuple of sockets, read in order, clockwise.
     # e.g. [0, 1, 2, 3] => [North, East, South ,West]
     sockets: tuple[Socket, ...]
-
-    def __repr__(self) -> str:
-        return self.tile
 
 
 @dataclass(unsafe_hash=True)
@@ -56,11 +89,13 @@ class Cell:
         random_tile_index = random.randrange(0, self.entropy())
         self.super_position = tuple([self.super_position[random_tile_index]])
 
-    def __repr__(self) -> str:
+    def render(self, height, width, dimensions):
         if self.collapsed:
-            return str(self.super_position[0])
+            self.super_position[0].render(height, width, dimensions)
+        if not any((tile.is_renderable() for tile in self.super_position)):
+            print("")
 
-        return ""
+            ""
 
 
 @dataclass
@@ -87,7 +122,7 @@ class Grid:
         for row in reversed(self.cells):
             yield row
 
-    def observe(self) -> None:
+    def observe(self) -> 'Grid':
         """
         Find the cell with the lowest entropy (that hasn't collapsed), and collapse it.
         """
@@ -99,7 +134,7 @@ class Grid:
 
         if not cells:
             self.collapsed = True
-            return
+            return self
 
         lowest_cell_entropy = min(cells.keys())
         random_cell_index = random.randrange(0, len(cells[lowest_cell_entropy]))
@@ -107,6 +142,7 @@ class Grid:
         cell.observe()
 
         self._propogate_observation(height, width, cell)
+        return copy.deepcopy(self)
 
     def _propogate_observation(self, height, width, cell) -> None:
         """
@@ -157,6 +193,6 @@ class Grid:
         """
         Render the current state to the console
         """
-        for row in self:
-            print("".join([str(cell) for cell in row]))
-
+        for height, row in enumerate(self):
+            for width, cell in enumerate(row):
+                CellRenderer.render(cell, height, width, self.dimensions)

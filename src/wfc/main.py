@@ -1,24 +1,15 @@
-from wfc.types_ import Cell, Tile, Grid
+import time
+from wfc.types_ import Grid
+from wfc.tiles import unicode_tiles, circuit_tiles
 
 #https://www.compart.com/en/unicode/block/U+2500
-default_super_position: Cell.SuperPosition = (
-    Tile(" ", (Tile.Socket(0), Tile.Socket(0), Tile.Socket(0), Tile.Socket(0))),
-    Tile("═", (Tile.Socket(0), Tile.Socket(1), Tile.Socket(0), Tile.Socket(1))),
-    Tile("║", (Tile.Socket(1), Tile.Socket(0), Tile.Socket(1), Tile.Socket(0))),
-    Tile("╔", (Tile.Socket(0), Tile.Socket(1), Tile.Socket(1), Tile.Socket(0))),
-    Tile("╚", (Tile.Socket(1), Tile.Socket(1), Tile.Socket(0), Tile.Socket(0))),
-    Tile("╗", (Tile.Socket(0), Tile.Socket(0), Tile.Socket(1), Tile.Socket(1))),
-    Tile("╝", (Tile.Socket(1), Tile.Socket(0), Tile.Socket(0), Tile.Socket(1))),
-    Tile("╠", (Tile.Socket(1), Tile.Socket(1), Tile.Socket(1), Tile.Socket(0))),
-    Tile("╣", (Tile.Socket(1), Tile.Socket(0), Tile.Socket(1), Tile.Socket(1))),
-    Tile("╦", (Tile.Socket(0), Tile.Socket(1), Tile.Socket(1), Tile.Socket(1))),
-    Tile("╩", (Tile.Socket(1), Tile.Socket(1), Tile.Socket(0), Tile.Socket(1))),
-    Tile("╬", (Tile.Socket(1), Tile.Socket(1), Tile.Socket(1), Tile.Socket(1))),
-)
 
-grid = Grid(dimensions=10, default_super_position=default_super_position)
-grid.render()
+grid = Grid(dimensions=10, default_super_position=unicode_tiles)
+stages = []
 while not grid.collapsed:
-    grid.observe()
+    stages.append(grid.observe())
+
+for grid_ in stages:
+    time.sleep(0.1)
     print("---")
-    grid.render()
+    grid_.render()
