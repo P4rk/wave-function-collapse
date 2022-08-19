@@ -1,5 +1,6 @@
 **Requires:**
 * Python3 
+* Pillow
 * (optionally) pyenv
 
 

@@ -1,15 +1,23 @@
-import time
 from wfc.types_ import Grid
 from wfc.tiles import unicode_tiles, circuit_tiles
 
 #https://www.compart.com/en/unicode/block/U+2500
 
-grid = Grid(dimensions=10, default_super_position=unicode_tiles)
+grid = Grid(dimensions=10, default_super_position=circuit_tiles)
 stages = []
+print("Collapsing...")
 while not grid.collapsed:
     stages.append(grid.observe())
 
-for grid_ in stages:
-    time.sleep(0.1)
-    print("---")
-    grid_.render()
+
+print("Rendering...")
+images = [grid_.render() for grid_ in stages]
+
+if any(images):
+    images[0].save(
+        'wfc.gif',
+        save_all=True,
+        append_images=images[1:],
+        duration=200,
+        loop=0,
+    )

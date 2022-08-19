@@ -5,11 +5,18 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
+from PIL import Image
+
 
 class TileRenderer:
     @staticmethod
     def is_rendereable(tile):
         return os.path.isfile(tile.tile)
+
+    @staticmethod
+    def render(tile):
+        img = Image.open(tile.tile)
+        return img.convert("RGB")
 
 
 class CellRenderer:
@@ -18,11 +25,13 @@ class CellRenderer:
         return any(TileRenderer.is_rendereable(tile) for tile in cell.super_position)
 
     @staticmethod
-    def render(cell, height, width, dimensions):
+    def render(cell, height, width, dimensions, image=None):
         if cell.collapsed:
             # render tile
             if CellRenderer.is_renderable(cell):
-                ...
+                tile_image = TileRenderer.render(cell.super_position[0])
+                image.paste(tile_image, (width*32, height*32))
+                return image
             else:
                 # If we are rendering the last cell we should render it with a line return
                 end = ""
@@ -32,7 +41,12 @@ class CellRenderer:
         else:
             # render possibilities
             if CellRenderer.is_renderable(cell):
-                ...
+                tile_image = TileRenderer.render(cell.super_position[0])
+                for tile in cell.super_position[1:]:
+                    tile_image = Image.blend(tile_image, TileRenderer.render(tile), 0.1)
+
+                image.paste(tile_image, (width*32, height*32))
+                return image
             else:
                 # If we are rendering the last cell we should render it with a line return
                 end = ""
@@ -94,8 +108,6 @@ class Cell:
             self.super_position[0].render(height, width, dimensions)
         if not any((tile.is_renderable() for tile in self.super_position)):
             print("")
-
-            ""
 
 
 @dataclass
@@ -193,6 +205,9 @@ class Grid:
         """
         Render the current state to the console
         """
+        image = Image.new("RGB", (self.dimensions*32, self.dimensions*32))
         for height, row in enumerate(self):
             for width, cell in enumerate(row):
-                CellRenderer.render(cell, height, width, self.dimensions)
+                image = CellRenderer.render(cell, height, width, self.dimensions, image)
+
+        return image
