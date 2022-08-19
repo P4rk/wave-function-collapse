@@ -15,4 +15,4 @@ def tile(filename, dir_in, dir_out, d):
         img.crop(box).save(out)
 
 
-tile("circuit.png", "../img/", "../img/tiles/circuit", 32)
+tile("celtic.png", "../img/", "../img/tiles/celtic", 32)
