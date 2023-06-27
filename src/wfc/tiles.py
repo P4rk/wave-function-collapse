@@ -1,5 +1,6 @@
 from wfc.types_ import Cell, Tile
 
+#https://www.compart.com/en/unicode/block/U+2500
 unicode_tiles: Cell.SuperPosition = (
     Tile(" ", (Tile.Socket(0), Tile.Socket(0), Tile.Socket(0), Tile.Socket(0))),
     Tile("═", (Tile.Socket(0), Tile.Socket(1), Tile.Socket(0), Tile.Socket(1))),

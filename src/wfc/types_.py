@@ -122,6 +122,8 @@ class Grid:
     cells: list[list[Cell]] = field(init=False)
     # Whether the entire wave has collapsed
     collapsed: bool = field(init=False, default=False)
+    # Whether the propagation of the observations wraps, e.g top tile to bottom tile.
+    wraps: bool = field(default=False)
 
     def __post_init__(self):
         self.cells = [None] * self.dimensions
@@ -173,6 +175,7 @@ class Grid:
         super_positions = cell.super_position
 
         for d_height, d_width, propagated_socket in [(-1, 0, UP), (0, -1, RIGHT), (1, 0, DOWN), (0, 1, LEFT)]:
+
             # Get possible sockets from the updated cell
             inverted_socket = (propagated_socket + 2) % 4
             possible_sockets = {tile.sockets[inverted_socket].socket for tile in super_positions}
@@ -180,6 +183,11 @@ class Grid:
             # Get the propagated cell (the cell to update)
             propagated_height = height + d_height
             propagated_width = width + d_width
+
+            if not self.wraps:
+                propagated_height = max(min(propagated_height, self.dimensions), 0)
+                propagated_width = max(min(propagated_width, self.dimensions), 0)
+
             try:
                 propagated_cell = self.cells[propagated_height][propagated_width]
                 if propagated_cell.collapsed:

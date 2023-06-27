@@ -1,9 +1,15 @@
 from wfc.types_ import Grid
-from wfc.tiles import unicode_tiles, circuit_tiles, molecule_tiles, brickwall_tiles, border_tiles, celtic_tiles
+from wfc.tiles import (
+    unicode_tiles,
+    circuit_tiles,
+    molecule_tiles,
+    brickwall_tiles,
+    border_tiles,
+    celtic_tiles,
+)
 
-#https://www.compart.com/en/unicode/block/U+2500
 
-grid = Grid(dimensions=10, default_super_position=celtic_tiles)
+grid = Grid(dimensions=10, default_super_position=circuit_tiles)
 stages = []
 print("Collapsing...")
 while not grid.collapsed:
